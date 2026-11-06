@@ -5,11 +5,9 @@ import com.google.inject.Provides;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.Client;
-import net.runelite.api.GameState;
 import net.runelite.api.NPC;
 import net.runelite.api.Skill;
 import net.runelite.api.events.ChatMessage;
-import net.runelite.api.events.GameStateChanged;
 import net.runelite.api.events.GameTick;
 import net.runelite.api.events.NpcDespawned;
 import net.runelite.api.events.NpcSpawned;
@@ -28,21 +26,9 @@ public class ThrallOverheadPlugin extends Plugin
 {
     protected static final String RESURRECT_THRALL_MESSAGE_START = "You resurrect a ";
     protected static final String RESURRECT_THRALL_MESSAGE_END = " thrall.</col>";
-    protected static final int LESSER_GHOST_ID = 10878;
-    protected static final int SUPERIOR_GHOST_ID = 10879;
-    protected static final int GREATER_GHOST_ID = 10880;
-    protected static final int LESSER_SKELETON_ID= 10881;
-    protected static final int SUPERIOR_SKELETON_ID= 10882;
-    protected static final int GREATER_SKELETON_ID= 10883;
-    protected static final int LESSER_ZOMBIE_ID = 10884;
-    protected static final int SUPERIOR_ZOMBIE_ID = 10885;
-    protected static final int GREATER_ZOMBIE_ID = 10886;
 
     @Inject
     private Client client;
-
-    @Inject
-    private ThrallOverheadConfig config;
 
     @Inject
     private OverlayManager overlayManager;
@@ -90,7 +76,6 @@ public class ThrallOverheadPlugin extends Plugin
             thrallTimer = new ThrallTimer(duration);
             overlay.setThrallTimer(thrallTimer);
 
-            log.debug("Thrall summoned. Duration: {} ticks", duration);
         }
     }
 
@@ -116,12 +101,9 @@ public class ThrallOverheadPlugin extends Plugin
     {
         NPC npc = event.getNpc();
 
-        log.info("NPC spawned: {} | ID: {}", npc.getName(), npc.getId());
-
         if (isThrall(npc))
         {
             overlay.setThrall(npc);
-            log.info("Thrall detected! ID: {}", npc.getId());
         }
     }
 
@@ -131,37 +113,12 @@ public class ThrallOverheadPlugin extends Plugin
         if (event.getNpc() == overlay.getThrall())
         {
             overlay.setThrall(null);
-            log.debug("Thrall despawned.");
         }
     }
 
     private boolean isThrall(NPC npc)
     {
-        switch (npc.getId())
-        {
-            case LESSER_GHOST_ID:
-            case SUPERIOR_GHOST_ID:
-            case GREATER_GHOST_ID:
-            case LESSER_SKELETON_ID:
-            case SUPERIOR_SKELETON_ID:
-            case GREATER_SKELETON_ID:
-            case LESSER_ZOMBIE_ID:
-            case SUPERIOR_ZOMBIE_ID:
-            case GREATER_ZOMBIE_ID:
-                return true;
-
-            default:
-                return false;
-        }
-    }
-
-    @Subscribe
-    public void onGameStateChanged(GameStateChanged event)
-    {
-        if (event.getGameState() == GameState.LOGGED_IN)
-        {
-            log.debug("Thrall Timer logged in.");
-        }
+       return Thralls.ALL_THRALLS.contains(npc.getId());
     }
 
     @Provides

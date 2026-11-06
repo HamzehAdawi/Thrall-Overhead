@@ -4,7 +4,6 @@ package com.thralloverhead;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics2D;
-import java.util.List;
 import javax.inject.Inject;
 import lombok.Getter;
 import lombok.Setter;
@@ -26,10 +25,6 @@ public class ThrallOverheadOverlay extends Overlay
     private static final Color WARNING_COLOR = Color.RED;
 
     private static final long FLASH_INTERVAL_MS = 200;
-
-    private static final List<Integer> GHOST_IDS = List.of(10878, 10879, 10880);
-    private static final List<Integer> SKELETON_IDS = List.of(10881, 10882, 10883);
-    private static final List<Integer> ZOMBIE_IDS = List.of(10884, 10885, 10886);
 
     private final ThrallOverheadConfig config;
 
@@ -105,17 +100,17 @@ public class ThrallOverheadOverlay extends Overlay
     {
         int summonedThrall = thrall.getId();
 
-        if (GHOST_IDS.contains(summonedThrall))
+        if (Thralls.GHOSTS.contains(summonedThrall))
         {
             return GHOST_COLOR;
         }
 
-        if (SKELETON_IDS.contains(summonedThrall))
+        if (Thralls.SKELETONS.contains(summonedThrall))
         {
             return SKELETON_COLOR;
         }
 
-        if (ZOMBIE_IDS.contains(summonedThrall))
+        if (Thralls.ZOMBIES.contains(summonedThrall))
         {
             return ZOMBIE_COLOR;
         }
