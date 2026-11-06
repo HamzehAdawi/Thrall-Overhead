@@ -3,8 +3,7 @@
 Displays an overhead duration bar above your summoned thralls, making it easier to track their remaining duration without having to keep checking the spell timer.
 Supports Ghost, Skeleton, and Zombie thralls, each with its own color-coded bar.
 
-<img width="1386" height="366" alt="Thrall Overhead Preview" src="https://github.com/user-attachments/assets/3b27613c-bfad-4340-acbd-67c7cd8f36b4" />
-
+<img width="1386" height="729" alt="demo" src="https://github.com/user-attachments/assets/3159c5c5-eed9-47a0-8fa0-d3b036166936" />
 
 ### Expiration Warning
 
