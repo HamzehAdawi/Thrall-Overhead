@@ -3,6 +3,7 @@ package com.thralloverhead;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import javax.inject.Inject;
 import lombok.Getter;
@@ -12,21 +13,14 @@ import net.runelite.api.Point;
 import net.runelite.client.ui.overlay.Overlay;
 import net.runelite.client.ui.overlay.OverlayLayer;
 import net.runelite.client.ui.overlay.OverlayPosition;
+import net.runelite.client.ui.overlay.OverlayUtil;
 
 public class ThrallOverheadOverlay extends Overlay
 {
-    private static final Color BACKGROUND_COLOR = Color.BLACK;
-    private static final Color BORDER_COLOR = Color.WHITE;
-
-    private static final Color GHOST_COLOR = new Color(32, 181, 191);
-    private static final Color SKELETON_COLOR = new Color(200, 220, 88);
-    private static final Color ZOMBIE_COLOR = new Color(180, 40, 40);
+    private final ThrallOverheadConfig config;
 
     private static final Color WARNING_COLOR = Color.RED;
-
     private static final long FLASH_INTERVAL_MS = 200;
-
-    private final ThrallOverheadConfig config;
 
     @Getter
     @Setter
@@ -47,7 +41,8 @@ public class ThrallOverheadOverlay extends Overlay
     @Override
     public Dimension render(Graphics2D graphics)
     {
-        if (!config.showTimer() || thrall == null || thrallTimer == null || thrallTimer.isExpired())
+        if ((!config.showBar() && !config.showTimer() && !config.flashWarningThrall())
+            || thrall == null || thrallTimer == null || thrallTimer.isExpired())
         {
             return null;
         }
@@ -71,28 +66,57 @@ public class ThrallOverheadOverlay extends Overlay
         int y = canvasPoint.getY();
 
         // Flash the background red during the final few ticks
-        boolean warning = config.flashWarning()
+        boolean warning = (config.flashWarning() || config.flashWarningThrall())
             && thrallTimer.getTicksRemaining() <= config.warningThreshold();
 
         boolean flashRed = warning &&
             (System.currentTimeMillis() / FLASH_INTERVAL_MS) % 2 == 0;
 
         // Background
-        graphics.setColor(flashRed ? WARNING_COLOR : BACKGROUND_COLOR);
-        graphics.fillRect(x, y, barWidth, barHeight);
-
-        // Remaining duration
-        int progressWidth = (int) (barWidth * thrallTimer.getProgress());
-
-        graphics.setColor(getThrallColor());
-        graphics.fillRect(x, y, progressWidth, barHeight);
-
-        // Border
-        if (config.showBorder())
+        if (config.showBar())
         {
-            graphics.setColor(BORDER_COLOR);
-            graphics.drawRect(x, y, barWidth, barHeight);
+            // Flash duration bar
+            graphics.setColor(flashRed && config.flashWarning() ? WARNING_COLOR : config.fillColor());
+            graphics.fillRect(x, y, barWidth, barHeight);
+
+            // Remaining duration
+            int progressWidth = (int) (barWidth * thrallTimer.getProgress());
+
+            graphics.setColor(getThrallColor());
+            graphics.fillRect(x, y, progressWidth, barHeight);
+
+            // Border
+            if (config.showBorder())
+            {
+                graphics.setColor(config.borderColor());
+                graphics.drawRect(x, y, barWidth, barHeight);
+            }
         }
+
+        // Thrall flash
+        if (config.flashWarningThrall() && flashRed)
+        {
+            OverlayUtil.renderPolygon(graphics, thrall.getConvexHull(), WARNING_COLOR);
+        }
+
+        // Optional Timer
+        if (config.showTimer())
+        {
+            int secondsRemaining = (int) Math.ceil(thrallTimer.getSecondsRemaining());
+            String timerText = (secondsRemaining - 1) + "";
+
+            FontMetrics metrics = graphics.getFontMetrics();
+
+            graphics.setColor(warning && config.flashWarning() && !flashRed
+                ? WARNING_COLOR : Color.WHITE);
+
+            graphics.drawString(
+                timerText,
+                config.showBar() ? x + barWidth + 4 : canvasPoint.getX() - metrics.stringWidth(timerText) / 2,
+                config.showBar() ? y + (barHeight + metrics.getAscent() - metrics.getDescent()) / 2 : y - 6
+            );
+        }
+
         return null;
     }
 
@@ -102,17 +126,17 @@ public class ThrallOverheadOverlay extends Overlay
 
         if (Thralls.GHOSTS.contains(summonedThrall))
         {
-            return GHOST_COLOR;
+            return config.mageColor();
         }
 
         if (Thralls.SKELETONS.contains(summonedThrall))
         {
-            return SKELETON_COLOR;
+            return config.rangeColor();
         }
 
         if (Thralls.ZOMBIES.contains(summonedThrall))
         {
-            return ZOMBIE_COLOR;
+            return config.meleeColor();
         }
 
         return Color.GREEN;

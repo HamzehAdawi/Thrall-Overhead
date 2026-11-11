@@ -1,10 +1,15 @@
 
 package com.thralloverhead;
 
+import lombok.Getter;
+
+@Getter
 public class ThrallTimer
 {
     private final int duration;
     private int ticksRemaining;
+    private final long startTime;
+    private final long durationNanos;
 
     public ThrallTimer(int duration)
     {
@@ -15,6 +20,8 @@ public class ThrallTimer
 
         this.duration = duration;
         this.ticksRemaining = duration;
+        this.startTime = System.nanoTime();
+        this.durationNanos = duration * 600_000_000L;
     }
 
     public void tick()
@@ -25,14 +32,10 @@ public class ThrallTimer
         }
     }
 
-    public int getTicksRemaining()
+    public double getSecondsRemaining()
     {
-        return ticksRemaining;
-    }
-
-    public int getDuration()
-    {
-        return duration;
+        long elapsed = System.nanoTime() - startTime;
+        return Math.max(0, (durationNanos - elapsed) / 1_000_000_000.0);
     }
 
     public boolean isExpired()
