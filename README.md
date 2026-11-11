@@ -1,9 +1,11 @@
 # Thrall Overhead
 
-Displays an overhead duration bar above your summoned thralls, making it easier to track their remaining duration without having to keep checking the spell timer.
-Supports Ghost, Skeleton, and Zombie thralls, each with its own color-coded bar.
+Display an overhead duration bar above summoned thralls to easily track their remaining time during PvM.
 
-<img width="1386" height="729" alt="demo" src="https://github.com/user-attachments/assets/3159c5c5-eed9-47a0-8fa0-d3b036166936" />
+<img width="1390" height="367" alt="tophalf" src="https://github.com/user-attachments/assets/f5674ca5-e0b8-4d30-b432-fe00e7fbf1ff" />
+
+<img width="1387" height="367" alt="bottom" src="https://github.com/user-attachments/assets/41e2d034-9ff8-4664-8c2f-d99ed2b176f1" />
+
 
 ### Expiration Warning
 
@@ -17,11 +19,14 @@ The bar flashes red when your thrall is approaching expiration, providing a clea
 
 Customize the overlay to your preference:
 
-- Toggle the overhead bar on or off.
-- Adjust bar width, height, and vertical offset.
-- Enable or disable the expiration warning.
-- Customize the warning threshold.
-- Toggle the bar border.
+- Toggle the overhead bar on or off
+- Adjust bar width, height, and vertical offset
+- Enable or disable the expiration warning
+- Customize the warning threshold
+- Toggle the bar border
+- Customize colors
+- Toggle thrall outline flash
+- Optional timer
 
 <br>
 
